@@ -58,6 +58,30 @@ They will be transcribed to this document after the hackathon.
 
 ## Bear.csv 
 
+
+```{r Bear}
+dataFile <- 'D:/college/GitRepo/Dataset/CPEAT/Bear.csv' #data location on computer
+allData <- read_csv(file = dataFile, skip = 1) #creates a table of all the data
+metaData <- allData[,1:2] %>% # read the first 2 columns of metadata
+  filter(!is.na(site_name)) %>% # remove empty rows
+  bind_rows(data.frame(site_name='site_name', Bear = 'Bear', 
+                       stringsAsFactors = FALSE)) %>% # transfers a miss 
+                                                      #...identified headers to data table
+  spread(key = site_name, value = Bear) #makes the table wide
+
+sample_data <-allData[,5:14] %>% #identify columns as samples 
+  gather(key = 'header', value = 'value', -depth, -peat_type) %>% #convert to long exclude chacter columns
+  filter(!is.na(value)) %>% # filter na columns
+  mutate(value=as.numeric(value))# convert char to numeric
+
+sample_data <- allData[,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>%
+                            #harmonize headers
+  filter(!is.na(value)) %>%
+  bind_rows(sample_data) #combine with previous samples 
+
+
+```
 ## Burnt_Village.csv 
 
 ## Covey_Hill.csv 
